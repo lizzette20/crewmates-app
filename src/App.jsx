@@ -24,7 +24,7 @@ function App() {
           <Route path="/" element={
             <div className="welcome">
               <h1>Welcome to the Crewmate Creator!</h1>
-              <p>Create your dream crew before they board their pastel spaceship 🪐</p>
+              <p>Create your dream crew before they board their mission 🪐</p>
               <img src="/crew-banner.png" alt="Cute Crewmates" style={{ width: '500%', borderRadius: '1rem', marginBottom: '1rem', height: '250px' }} />
             </div>
           } />

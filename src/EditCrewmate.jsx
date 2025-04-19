@@ -7,11 +7,12 @@ export default function EditCrewmate() {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     name: '',
+    category: '',
     class: '',
     primary_tool: '',
     level: '',
     trait: '',
-    alignment: '',
+    alignment: ''
   })
 
   useEffect(() => {
@@ -22,8 +23,12 @@ export default function EditCrewmate() {
         .eq('id', id)
         .single()
 
-      if (error) console.error(error)
-      else setFormData(data)
+      if (error) {
+        console.error('❌ Error fetching crewmate:', error)
+      } else {
+        console.log('📥 Loaded data:', data)
+        setFormData(data)
+      }
     }
 
     fetchCrewmate()
@@ -36,13 +41,29 @@ export default function EditCrewmate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const { error } = await supabase
-      .from('crewmates')
-      .update(formData)
-      .eq('id', id)
 
-    if (error) console.error(error)
-    else {
+    const updates = {
+      id: id, // required for upsert
+      name: formData.name,
+      category: formData.category,
+      class: formData.class,
+      primary_tool: formData.primary_tool,
+      level: parseInt(formData.level),
+      trait: formData.trait,
+      alignment: formData.alignment
+    }
+
+    console.log('📤 Submitting this data:', updates)
+
+    const { data, error } = await supabase
+      .from('crewmates')
+      .upsert(updates, { onConflict: 'id' })
+      .select()
+
+    if (error) {
+      console.error('❌ Error updating crewmate:', error)
+    } else {
+      console.log('✅ Updated data:', data)
       alert('Crewmate updated!')
       navigate(`/crewmate/${id}`)
     }
@@ -66,9 +87,9 @@ export default function EditCrewmate() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="card">
       <h2>Edit Crewmate</h2>
-      {['name', 'class', 'primary_tool', 'level', 'trait', 'alignment'].map((field) => (
+      {['name', 'category', 'class', 'primary_tool', 'level', 'trait', 'alignment'].map((field) => (
         <div key={field}>
           <label>{field}</label>
           <input
